@@ -1,6 +1,9 @@
 #include <iostream>
+#include "src/zinny.h"
 
 int main(int, char**) 
-{
-    std::cout << "Hello, world!\n";
+{   
+    auto z = new zinny(); 
+
+    std::cout << "dd" << std::endl;
 }

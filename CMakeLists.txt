@@ -4,7 +4,11 @@ project(zinny VERSION 0.1.0)
 include(CTest)
 enable_testing()
 
-add_executable(zinny main.cpp)
+set(HEADERS src/zinny.h)
+
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+add_executable(zinny main.cpp ${HEADERS})
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
