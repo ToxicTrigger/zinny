@@ -4,7 +4,7 @@ project(zinny VERSION 0.1.0)
 include(CTest)
 enable_testing()
 
-set(HEADERS src/zinny.h)
+set(HEADERS src/zinny.h src/zinny-tool.h)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
