@@ -1,9 +1,28 @@
 #include <iostream>
+#include <string>
+#include <vector>
+
 #include "src/zinny.h"
+#include "src/zinny-tool.h"
 
-int main(int, char**) 
-{   
-    auto z = new zinny(); 
+int main(int in, char **argv)
+{
+    std::string cur_exec_name = argv[0];
+    std::string first_arg;
+    std::vector<std::string> all_args;
 
-    std::cout << "dd" << std::endl;
+    if(check_validate(in))
+    {
+        first_arg = argv[1];
+        all_args.assign(argv + 1, argv + in);
+
+        std::cout << first_arg << std::endl;
+        auto z = new zinny();
+        std::cout << "dd" << std::endl;
+    }
+    else
+    {
+        show_help();
+    }
+    return 0;
 }
