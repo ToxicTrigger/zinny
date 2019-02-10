@@ -61,6 +61,9 @@ public:
 			in.close();
 		}
 
+		// TODO HERE
+		// Binary Write code
+
 		int buf_size = sizeof(this->readable) + size;
 		char buf[buf_size];
 		out.write(buf, buf_size);
