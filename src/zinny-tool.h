@@ -22,6 +22,10 @@ static void action(std::vector<std::string> const args, zinny *pot)
     {
         pot->view();
     }
+    else if(args[0] == "-u")
+    {
+        pot->unpack();
+    }
 }
 
 static void const show_help()
