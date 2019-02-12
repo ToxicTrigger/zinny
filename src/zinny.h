@@ -46,6 +46,7 @@ class zinny
 		this->command = command;
 	}
 
+	//TODO Directory pack
 	bool packing()
 	{
 		std::ofstream out;
