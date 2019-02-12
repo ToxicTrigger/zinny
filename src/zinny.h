@@ -213,6 +213,27 @@ class zinny
 		std::cout << "sucsess : " << this->size << " byte are readed!" << std::endl << std::endl;
 		return size;
 	}
+
+	void init()
+	{
+		std::string out_path;
+		std::string command = "mkdir ";
+
+		char dir[1000];
+		getcwd(dir, 1000);
+
+		out_path = dir;
+		out_path += "/";
+		system((command + out_path + this->command[1]).c_str());
+		out_path += this->command[1];
+	
+		system((command + out_path + "/Assets").c_str());
+		system((command + out_path + "/Build").c_str());
+		system((command + out_path + "/ProjectSetting").c_str());
+		//TODO TOML Parse
+
+		std::cout << "init done" << std::endl << std::endl;
+	}
 };
 
 #endif
