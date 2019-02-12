@@ -162,8 +162,17 @@ class zinny
 
 		std::string pot_name = this->command[1];
 		pot_name.resize(pot_name.size() - 4);
-		out_path += pot_name;
-
+    if(this->command.size() > 2)
+    {
+      std::cout << " test "<< this->command[2] << std::endl;
+      out_path += slash +this->command[2];
+      out_path += pot_name;
+    }
+    else
+    {
+      out_path += pot_name;
+    }
+    
 		const int dir_err = system(("mkdir " + out_path).c_str());
 		if (dir_err == -1)
 		{
@@ -202,7 +211,6 @@ class zinny
 			std::ofstream out(real_name, std::ios::binary);
 
 			std::cout << "OUT : " << real_name << std::endl;
-			uint start = in.tellg();
 
 			char *buf = new char[ssize];
 			in.read(reinterpret_cast<char *>(buf), ssize);
@@ -245,7 +253,7 @@ class zinny
 #endif
 
 		char dir[1000];
-		getcwd(dir, 1000);
+		GetCurrentDir(dir, 1000);
 
 		out_path = dir;
 		out_path += slash;
