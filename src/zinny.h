@@ -162,17 +162,18 @@ class zinny
 
 		std::string pot_name = this->command[1];
 		pot_name.resize(pot_name.size() - 4);
+
     if(this->command.size() > 2)
     {
       std::cout << " test "<< this->command[2] << std::endl;
-      out_path += slash +this->command[2];
+      out_path += this->command[2];
       out_path += pot_name;
     }
     else
     {
       out_path += pot_name;
     }
-    
+
 		const int dir_err = system(("mkdir " + out_path).c_str());
 		if (dir_err == -1)
 		{
