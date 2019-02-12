@@ -58,6 +58,7 @@
         "memory": "cpp",
         "mutex": "cpp",
         "ratio": "cpp",
-        "string": "cpp"
+        "string": "cpp",
+        "xstring": "cpp"
     }
 }

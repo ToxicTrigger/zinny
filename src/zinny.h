@@ -6,8 +6,16 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
-#include <unistd.h>
 #include <cstdlib>
+
+#ifdef _WIN64
+#include <direct.h>
+#define GetCurrentDir _getcwd
+#define uint uint64_t
+#else
+#include <unistd.h>
+#define GetCurrentDir getcwd
+#endif
 
 #define ARCHIVE_NAME ".pot"
 
@@ -46,6 +54,7 @@ class zinny
 		this->command = command;
 	}
 
+	//TODO Directory pack
 	bool packing()
 	{
 		std::ofstream out;
@@ -138,9 +147,19 @@ class zinny
 		}
 		std::string out_path;
 		char dir[1000];
-		getcwd(dir, 1000);
+		GetCurrentDir(dir, 1000);
 		out_path = dir;
-		out_path += "/";
+    
+    std::string slash;
+
+#ifdef _WIN64
+		slash = "\\";
+#else
+		slash += "/";
+#endif
+
+    out_path += slash;
+
 		std::string pot_name = this->command[1];
 		pot_name.resize(pot_name.size() - 4);
 		out_path += pot_name;
@@ -179,7 +198,7 @@ class zinny
 		for (int i = 0; i < size; ++i)
 		{
 			uint ssize = file_size[i];
-			std::string real_name = out_path + "/" + filenames[i].substr(filenames[i].rfind('/') + 1);
+			std::string real_name = out_path + slash + filenames[i].substr(filenames[i].rfind(slash.c_str()) + 1);
 			std::ofstream out(real_name, std::ios::binary);
 
 			std::cout << "OUT : " << real_name << std::endl;
@@ -211,6 +230,34 @@ class zinny
 		this->size = size;
 		std::cout << "sucsess : " << this->size << " byte are readed!" << std::endl << std::endl;
 		return size;
+	}
+
+	void init()
+	{
+		std::string out_path;
+		std::string command = "mkdir ";
+    std::string slash;
+
+#ifdef _WIN64
+		slash = "\\";
+#else
+		slash += "/";
+#endif
+
+		char dir[1000];
+		getcwd(dir, 1000);
+
+		out_path = dir;
+		out_path += slash;
+		system((command + out_path + this->command[1]).c_str());
+		out_path += this->command[1];
+	
+		system((command + out_path + slash + "Assets").c_str());
+		system((command + out_path + slash + "Build").c_str());
+		system((command + out_path + slash + "ProjectSetting").c_str());
+		//TODO TOML Parse
+
+		std::cout << "init done" << std::endl << std::endl;
 	}
 };
 
