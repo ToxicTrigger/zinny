@@ -6,40 +6,40 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
-
+#include <unistd.h>
 #define ARCHIVE_NAME ".pot"
 
 /*
 readable + version + sha256_key + file_list + file_size_list + files
 */
 
-class zinny 
+class zinny
 {
-private:
+  private:
 	uint size;
 	std::string name;
 	bool readable = true;
 	std::vector<std::string> command;
 	const int version = 1;
 
-public:
+  public:
 	zinny(std::vector<std::string> command)
 	{
-		this->name = command[1] + ARCHIVE_NAME;	
+		this->name = command[1] + ARCHIVE_NAME;
 		this->command = command;
 	}
 
 	bool packing()
 	{
 		std::ofstream out;
-		out.open(name , std::ios::binary);
+		out.open(name, std::ios::binary);
 
-		out.write(reinterpret_cast<const char*>(&this->readable), sizeof(bool));
-		out.write(reinterpret_cast<const char*>(&this->version), sizeof(int));
+		out.write(reinterpret_cast<const char *>(&this->readable), sizeof(bool));
+		out.write(reinterpret_cast<const char *>(&this->version), sizeof(int));
 		uint tmp = this->command.size() - 2;
-		out.write(reinterpret_cast<const char*>(&tmp), sizeof(uint));
+		out.write(reinterpret_cast<const char *>(&tmp), sizeof(uint));
 
-		for(int i = 2; i < this->command.size() ; ++i)
+		for (int i = 2; i < this->command.size(); ++i)
 		{
 			std::ifstream in(this->command[i], std::ios::binary);
 			//file_name
@@ -51,13 +51,13 @@ public:
 			in.close();
 		}
 
-		for(int i = 2; i < this->command.size() ; ++i)
+		for (int i = 2; i < this->command.size(); ++i)
 		{
 			std::ifstream in(this->command[i], std::ios::binary);
 			//file_size
 			in.seekg(0, std::ios::end);
 			auto size = in.tellg();
-			out.write(reinterpret_cast<const char*>(&size), sizeof(std::size_t));
+			out.write(reinterpret_cast<const char *>(&size), sizeof(std::size_t));
 			in.close();
 		}
 
@@ -74,28 +74,28 @@ public:
 		std::ifstream in(this->command[1], std::ios::binary);
 
 		bool readable;
-		in.read(reinterpret_cast<char*>(&readable), sizeof(bool));
+		in.read(reinterpret_cast<char *>(&readable), sizeof(bool));
 		std::cout << "Readable \t: " << readable << std::endl;
 
 		int version;
-		in.read(reinterpret_cast<char*>(&version), sizeof(int));
+		in.read(reinterpret_cast<char *>(&version), sizeof(int));
 		std::cout << "Version \t: " << version << std::endl;
 
 		uint size;
-		in.read(reinterpret_cast<char*>(&size), sizeof(uint));
+		in.read(reinterpret_cast<char *>(&size), sizeof(uint));
 		std::cout << "Files \t\t: " << size << std::endl;
 
 		auto filenames = std::vector<std::string>();
-		for(int i = 0; i < size ; ++i)
+		for (int i = 0; i < size; ++i)
 		{
 			std::string name;
 			std::getline(in, name, '\0');
 			filenames.push_back(name);
 		}
-		for(int i = 0; i < size ; ++i)
+		for (int i = 0; i < size; ++i)
 		{
 			std::size_t ssize;
-			in.read(reinterpret_cast<char*>(&ssize), sizeof(std::size_t));
+			in.read(reinterpret_cast<char *>(&ssize), sizeof(std::size_t));
 			std::cout << "\tname : " << filenames[i] << std::endl;
 			std::cout << "\t- " << ssize << " bytes" << std::endl;
 			std::cout << std::endl;
@@ -104,7 +104,8 @@ public:
 
 	int open(std::string path)
 	{
-		if(path.empty()) return 0;
+		if (path.empty())
+			return 0;
 
 		std::ifstream fin;
 		fin.open(path, std::ios::binary);
@@ -114,10 +115,30 @@ public:
 
 		fin.seekg(0, std::ios::beg);
 		this->size = size;
-		std::cout << "sucsess : " << this->size << " byte are readed!"<< std::endl;
+		std::cout << "sucsess : " << this->size << " byte are readed!" << std::endl;
 		return size;
 	}
-};
 
+	void init()
+	{
+		std::string out_path;
+		std::string command = "mkdir ";
+
+		char dir[1000];
+		getcwd(dir, 1000);
+
+		out_path = dir;
+		out_path += "/";
+		system((command + out_path + this->command[1]).c_str());
+		out_path += this->command[1];
+	
+		system((command + out_path + "/Assets").c_str());
+		system((command + out_path + "/Build").c_str());
+		system((command + out_path + "/ProjectSetting").c_str());
+		//TODO TOML Parse
+
+		std::cout << "init done" << std::endl << std::endl;
+	}
+};
 
 #endif
