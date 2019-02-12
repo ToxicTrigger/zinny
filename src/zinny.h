@@ -7,6 +7,7 @@
 #include <fstream>
 #include <vector>
 #include <unistd.h>
+#include <cstdlib>
 
 #define ARCHIVE_NAME ".pot"
 
@@ -86,7 +87,9 @@ class zinny
 		}
 
 		out.close();
+		std::cout << std::endl;
 		std::cout << this->name << " Packaged." << std::endl;
+		std::cout << std::endl;
 		return true;
 	}
 
@@ -121,21 +124,37 @@ class zinny
 			std::cout << "\t- " << ssize << " bytes" << std::endl;
 			std::cout << std::endl;
 		}
+		std::cout << std::endl;
 	}
 
 	void unpack()
 	{
 		std::ifstream in(this->command[1], std::ios::binary);
-		if(!in.is_open())
+		if (!in.is_open())
 		{
-			std::cout << "Faile" << std::endl;
+			std::cout << "Fail!" << std::endl;
+			std::cout << "Can't Find " << this->command[1] << std::endl;
+			return;
 		}
 		std::string out_path;
 		char dir[1000];
 		getcwd(dir, 1000);
 		out_path = dir;
 		out_path += "/";
+		std::string pot_name = this->command[1];
+		pot_name.resize(pot_name.size() - 4);
+		out_path += pot_name;
 
+		const int dir_err = system(("mkdir " + out_path).c_str());
+		if (dir_err == -1)
+		{
+			std::cout << "Fail : " << out_path << std::endl;
+		}
+		else
+		{
+			std::cout << "Out Path : " << out_path << std::endl;
+		}
+	
 		uint size = this->skip(&in);
 
 		//1. load file size
@@ -156,22 +175,25 @@ class zinny
 			std::cout << std::endl;
 			file_size.push_back(ssize);
 		}
-
-		std::cout << out_path << std::endl;
-
+		std::cout << "---------------------------------" << std::endl;
 		for (int i = 0; i < size; ++i)
 		{
 			uint ssize = file_size[i];
-			std::ofstream out(filenames[i].substr(filenames[i].rfind('/')+1), std::ios::binary);
-			std::cout << "start: " << in.tellg()  << " size : " << ssize << std::endl;
+			std::string real_name = out_path + "/" + filenames[i].substr(filenames[i].rfind('/') + 1);
+			std::ofstream out(real_name, std::ios::binary);
+
+			std::cout << "OUT : " << real_name << std::endl;
 			uint start = in.tellg();
 
 			char *buf = new char[ssize];
-			in.read(reinterpret_cast<char*>(buf), ssize);
-			out.write(reinterpret_cast<const char*>(buf), ssize);
-			
+			in.read(reinterpret_cast<char *>(buf), ssize);
+			out.write(reinterpret_cast<const char *>(buf), ssize);
+
 			out.close();
 		}
+		std::cout << "---------------------------------" << std::endl;
+		std::cout << "un-packaging " << out_path << std::endl;
+		std::cout << std::endl;
 	}
 
 	int open(std::string path)
@@ -187,7 +209,7 @@ class zinny
 
 		fin.seekg(0, std::ios::beg);
 		this->size = size;
-		std::cout << "sucsess : " << this->size << " byte are readed!" << std::endl;
+		std::cout << "sucsess : " << this->size << " byte are readed!" << std::endl << std::endl;
 		return size;
 	}
 };
