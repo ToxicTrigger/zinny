@@ -15,16 +15,20 @@ readable + version + sha256_key + file_list + file_size_list + files
 
 class zinny 
 {
+public:
+	int version;
+
 private:
 	uint size;
 	std::string name;
-	bool readable = true;
+	bool readable;
 	std::vector<std::string> command;
-	const int version = 1;
-
+	
 public:
 	zinny(std::vector<std::string> command)
 	{
+		this->version = 1;
+		this->readable = true;
 		this->name = command[1] + ARCHIVE_NAME;	
 		this->command = command;
 	}
@@ -56,24 +60,27 @@ public:
 			std::ifstream in(this->command[i], std::ios::binary);
 			//file_size
 			in.seekg(0, std::ios::end);
-			auto size = in.tellg();
-			out.write(reinterpret_cast<const char*>(&size), sizeof(std::size_t));
+			uint size = in.tellg();
+			out.write(reinterpret_cast<const char*>(&size), sizeof(uint));
 			in.close();
 		}
 
-		// TODO HERE
-		// Binary Write code
+		for(int i = 2; i < this->command.size() ; ++i)
+		{
+			std::ifstream in(this->command[i], std::ios::binary);
+			out << in.rdbuf();
+			std::cout << "\t- " << this->command[i] << " Packed" << std::endl;
+			in.close();
+		}
 
-		int buf_size = sizeof(this->readable) + size;
-		char buf[buf_size];
-		out.write(buf, buf_size);
+		out.close();
 		std::cout << this->name << " Packaged." << std::endl;
 		return true;
 	}
 
 	void view()
 	{
-		auto file_list = std::vector<std::string>();
+		std::vector<std::string> file_list = std::vector<std::string>();
 		std::ifstream in(this->command[1], std::ios::binary);
 
 		bool readable;
@@ -88,7 +95,7 @@ public:
 		in.read(reinterpret_cast<char*>(&size), sizeof(uint));
 		std::cout << "Files \t\t: " << size << std::endl;
 
-		auto filenames = std::vector<std::string>();
+		std::vector<std::string> filenames = std::vector<std::string>();
 		for(int i = 0; i < size ; ++i)
 		{
 			std::string name;
@@ -97,8 +104,8 @@ public:
 		}
 		for(int i = 0; i < size ; ++i)
 		{
-			std::size_t ssize;
-			in.read(reinterpret_cast<char*>(&ssize), sizeof(std::size_t));
+			uint ssize;
+			in.read(reinterpret_cast<char*>(&ssize), sizeof(uint));
 			std::cout << "\tname : " << filenames[i] << std::endl;
 			std::cout << "\t- " << ssize << " bytes" << std::endl;
 			std::cout << std::endl;

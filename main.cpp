@@ -16,7 +16,7 @@ int main(int in, char **argv)
         first_arg = argv[1];
         all_args.assign(argv + 1, argv + in);
 
-        auto z = new zinny(all_args);
+        zinny *z = new zinny(all_args);
         action(all_args, z);
     }
     else
