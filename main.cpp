@@ -16,9 +16,8 @@ int main(int in, char **argv)
         first_arg = argv[1];
         all_args.assign(argv + 1, argv + in);
 
-        std::cout << first_arg << std::endl;
-        auto z = new zinny();
-        std::cout << "dd" << std::endl;
+        zinny *z = new zinny(all_args);
+        action(all_args, z);
     }
     else
     {
