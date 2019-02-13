@@ -6,7 +6,6 @@ enable_testing()
 
 set(HEADERS src/zinny.h src/zinny-tool.h)
 
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 add_executable(zinny main.cpp ${HEADERS})
 

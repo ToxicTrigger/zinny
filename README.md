@@ -8,12 +8,12 @@ zinny 는 trigger 엔진에서 사용되는 패키지 매니저 입니다.
 
 - [ ] init 			
 - [ ] build
-- [ ] help
+- [x] help
 - [ ] pack -> -p {out name} {filenames...}
-- [ ] unpack -> -u {filename.pot} {path}
-- [ ] view -> -v {filename.pot}
+- [x] unpack -> -u {filename.pot} {path}
+- [x] view -> -v {filename.pot}
 - [ ] all check -> -a
-- [ ] check -> -c {file}
+- [x] check -> -c {file}
 
 ## Command
 
@@ -34,6 +34,8 @@ zinny 는 trigger 엔진에서 사용되는 패키지 매니저 입니다.
 -p 로 줄일 수 있으며 `{out name} `의 `out_name.pot` 파일을 만들어 냅니다.
 
 해당 파일에 들어가야 하는 파일들은 `{filenames...}` 로 정할 수 있습니다.
+
+`--ur` 을 붙이면 해당 pot 의 내부를 조회할 수 없도록 합니다.
 
 
 
