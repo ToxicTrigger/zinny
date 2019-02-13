@@ -81,7 +81,7 @@ class zinny
 				break;
 			}
 			//file_name
-			out.write(this->command[i].c_str(), count);
+			out.write(this->command[i].c_str(), this->command[i].size());
 			out.write("\0", sizeof(char));
 			in.seekg(0, std::ios::end);
 			this->size += in.tellg();
