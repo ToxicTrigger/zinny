@@ -149,8 +149,8 @@ class zinny
 		char dir[1000];
 		GetCurrentDir(dir, 1000);
 		out_path = dir;
-    
-    std::string slash;
+
+		std::string slash;
 
 #ifdef _WIN64
 		slash = "\\";
@@ -158,21 +158,21 @@ class zinny
 		slash += "/";
 #endif
 
-    out_path += slash;
+		out_path += slash;
 
 		std::string pot_name = this->command[1];
 		pot_name.resize(pot_name.size() - 4);
 
-    if(this->command.size() > 2)
-    {
-      std::cout << " test "<< this->command[2] << std::endl;
-      out_path += this->command[2];
-      out_path += pot_name;
-    }
-    else
-    {
-      out_path += pot_name;
-    }
+		if (this->command.size() > 2)
+		{
+			std::cout << " test " << this->command[2] << std::endl;
+			out_path += this->command[2];
+			out_path += pot_name;
+		}
+		else
+		{
+			out_path += pot_name;
+		}
 
 		const int dir_err = system(("mkdir " + out_path).c_str());
 		if (dir_err == -1)
@@ -183,7 +183,7 @@ class zinny
 		{
 			std::cout << "Out Path : " << out_path << std::endl;
 		}
-	
+
 		uint size = this->skip(&in);
 
 		//1. load file size
@@ -237,7 +237,8 @@ class zinny
 
 		fin.seekg(0, std::ios::beg);
 		this->size = size;
-		std::cout << "sucsess : " << this->size << " byte are readed!" << std::endl << std::endl;
+		std::cout << "sucsess : " << this->size << " byte are readed!" << std::endl
+				  << std::endl;
 		return size;
 	}
 
@@ -245,7 +246,7 @@ class zinny
 	{
 		std::string out_path;
 		std::string command = "mkdir ";
-    std::string slash;
+		std::string slash;
 
 #ifdef _WIN64
 		slash = "\\";
@@ -260,13 +261,78 @@ class zinny
 		out_path += slash;
 		system((command + out_path + this->command[1]).c_str());
 		out_path += this->command[1];
-	
+
 		system((command + out_path + slash + "Assets").c_str());
 		system((command + out_path + slash + "Build").c_str());
 		system((command + out_path + slash + "ProjectSetting").c_str());
 		//TODO TOML Parse
 
-		std::cout << "init done" << std::endl << std::endl;
+		std::cout << "init done" << std::endl
+				  << std::endl;
+	}
+
+	bool check()
+	{
+		std::ifstream in(this->command[1], std::ios::binary);
+		if (!in.is_open())
+		{
+			return false;
+		}
+		in.seekg(0, std::ios::end);
+		//check pot size
+		uint pot_size = in.tellg();
+		in.seekg(0, std::ios::beg);
+
+		uint real_size = 0;
+
+		bool readable;
+		in.read(reinterpret_cast<char *>(&readable), sizeof(bool));
+		real_size += in.tellg();
+		int version;
+		in.read(reinterpret_cast<char *>(&version), sizeof(int));
+		real_size += (uint)in.tellg() - real_size;
+		uint size;
+		in.read(reinterpret_cast<char *>(&size), sizeof(uint));
+		real_size += (uint)in.tellg() - real_size;
+
+		//check pot all files size
+		std::vector<std::string> filenames = std::vector<std::string>();
+		for (int i = 0; i < size; ++i)
+		{
+			std::string name;
+			std::getline(in, name, '\0');
+			real_size += (uint)in.tellg() - real_size;
+			filenames.push_back(name);
+		}
+		std::vector<uint> file_size = std::vector<uint>();
+		for (int i = 0; i < size; ++i)
+		{
+			uint ssize;
+			in.read(reinterpret_cast<char *>(&ssize), sizeof(uint));
+			real_size += (uint)in.tellg() - real_size;
+			file_size.push_back(ssize);
+		}
+
+		for (int i = 0; i < size; ++i)
+		{
+			uint ssize = file_size[i];
+			char *buf = new char[ssize];
+			in.read(reinterpret_cast<char *>(buf), ssize);
+			real_size += (uint)in.tellg() - real_size;
+		}
+
+		if (real_size != pot_size)
+		{
+			std::cout << "---------------------------------" << std::endl;
+			std::cout << this->command[1] << " is Broken!" << std::endl;
+			std::cout << "Real : " << real_size << std::endl;
+			std::cout << "pot : " << pot_size << std::endl;
+			std::cout << std::endl;
+			return false;
+		}
+
+		std::cout << "Un-Packageable File : " << this->command[1] << std::endl;
+		return true;
 	}
 };
 

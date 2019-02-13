@@ -30,6 +30,10 @@ static void action(std::vector<std::string> const args, zinny *pot)
     {
         pot->init();
     }
+    else if(args[0] == "-c")
+    {
+        pot->check();
+    }
 }
 
 static void const show_help()
