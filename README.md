@@ -8,7 +8,7 @@ zinny 는 trigger 엔진에서 사용되는 패키지 매니저 입니다.
 
 - [ ] init 			
 - [ ] build
-- [ ] help
+- [x] help
 - [ ] pack -> -p {out name} {filenames...}
 - [ ] unpack -> -u {filename.pot} {path}
 - [ ] view -> -v {filename.pot}
