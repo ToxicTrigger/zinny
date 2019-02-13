@@ -60,16 +60,28 @@ class zinny
 		std::ofstream out;
 		out.open(name, std::ios::binary);
 
-		out.write(reinterpret_cast<const char *>(&this->readable), sizeof(bool));
-		out.write(reinterpret_cast<const char *>(&this->version), sizeof(int));
-		uint tmp = this->command.size() - 2;
-		out.write(reinterpret_cast<const char *>(&tmp), sizeof(uint));
+		uint count = this->command.size();
+		if(this->command[this->command.size()-1] == "-ur")
+		{
+			this->readable = false;
+			count --;
+		}
 
-		for (int i = 2; i < this->command.size(); ++i)
+		out.write(reinterpret_cast<const char*>(&this->readable), sizeof(bool));
+		out.write(reinterpret_cast<const char*>(&this->version), sizeof(int));
+		uint tmp = count - 2;
+		out.write(reinterpret_cast<const char*>(&tmp), sizeof(uint));
+
+		for(int i = 2; i < count ; ++i)
 		{
 			std::ifstream in(this->command[i], std::ios::binary);
+			if(!in.is_open())
+			{
+				std::cout << "Can't Find : " << this->command[i] << std::endl;
+				break;
+			}
 			//file_name
-			out.write(this->command[i].c_str(), this->command[i].size());
+			out.write(this->command[i].c_str(), count);
 			out.write("\0", sizeof(char));
 			in.seekg(0, std::ios::end);
 			this->size += in.tellg();
@@ -77,9 +89,14 @@ class zinny
 			in.close();
 		}
 
-		for (int i = 2; i < this->command.size(); ++i)
+		for(int i = 2; i < count ; ++i)
 		{
 			std::ifstream in(this->command[i], std::ios::binary);
+			if(!in.is_open())
+			{
+				std::cout << "Can't Find : " << this->command[i] << std::endl;
+				break;
+			}
 			//file_size
 			in.seekg(0, std::ios::end);
 			uint size = in.tellg();
@@ -87,9 +104,14 @@ class zinny
 			in.close();
 		}
 
-		for (int i = 2; i < this->command.size(); ++i)
+		for(int i = 2; i < count ; ++i)
 		{
 			std::ifstream in(this->command[i], std::ios::binary);
+			if(!in.is_open())
+			{
+				std::cout << "Can't Find : " << this->command[i] << std::endl;
+				break;
+			}
 			out << in.rdbuf();
 			std::cout << "\t- " << this->command[i] << " Packed" << std::endl;
 			in.close();
