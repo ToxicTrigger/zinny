@@ -273,66 +273,74 @@ class zinny
 
 	bool check()
 	{
-		std::ifstream in(this->command[1], std::ios::binary);
-		if (!in.is_open())
+		uint number = this->command.size();
+		bool query_done = true;
+		for (int x = 1; x < number; ++x)
 		{
-			return false;
-		}
-		in.seekg(0, std::ios::end);
-		//check pot size
-		uint pot_size = in.tellg();
-		in.seekg(0, std::ios::beg);
+			std::ifstream in(this->command[x], std::ios::binary);
+			if (!in.is_open())
+			{
+				query_done = false;
+				std::cout << "\t- Can't Find " << this->command[x] << std::endl;
+				break;
+			}
+			in.seekg(0, std::ios::end);
+			//check pot size
+			uint pot_size = in.tellg();
+			in.seekg(0, std::ios::beg);
 
-		uint real_size = 0;
+			uint real_size = 0;
 
-		bool readable;
-		in.read(reinterpret_cast<char *>(&readable), sizeof(bool));
-		real_size += in.tellg();
-		int version;
-		in.read(reinterpret_cast<char *>(&version), sizeof(int));
-		real_size += (uint)in.tellg() - real_size;
-		uint size;
-		in.read(reinterpret_cast<char *>(&size), sizeof(uint));
-		real_size += (uint)in.tellg() - real_size;
-
-		//check pot all files size
-		std::vector<std::string> filenames = std::vector<std::string>();
-		for (int i = 0; i < size; ++i)
-		{
-			std::string name;
-			std::getline(in, name, '\0');
+			bool readable;
+			in.read(reinterpret_cast<char *>(&readable), sizeof(bool));
+			real_size += in.tellg();
+			int version;
+			in.read(reinterpret_cast<char *>(&version), sizeof(int));
 			real_size += (uint)in.tellg() - real_size;
-			filenames.push_back(name);
-		}
-		std::vector<uint> file_size = std::vector<uint>();
-		for (int i = 0; i < size; ++i)
-		{
-			uint ssize;
-			in.read(reinterpret_cast<char *>(&ssize), sizeof(uint));
+			uint size;
+			in.read(reinterpret_cast<char *>(&size), sizeof(uint));
 			real_size += (uint)in.tellg() - real_size;
-			file_size.push_back(ssize);
-		}
 
-		for (int i = 0; i < size; ++i)
-		{
-			uint ssize = file_size[i];
-			char *buf = new char[ssize];
-			in.read(reinterpret_cast<char *>(buf), ssize);
-			real_size += (uint)in.tellg() - real_size;
-		}
+			//check pot all files size
+			std::vector<std::string> filenames = std::vector<std::string>();
+			for (int i = 0; i < size; ++i)
+			{
+				std::string name;
+				std::getline(in, name, '\0');
+				real_size += (uint)in.tellg() - real_size;
+				filenames.push_back(name);
+			}
+			std::vector<uint> file_size = std::vector<uint>();
+			for (int i = 0; i < size; ++i)
+			{
+				uint ssize;
+				in.read(reinterpret_cast<char *>(&ssize), sizeof(uint));
+				real_size += (uint)in.tellg() - real_size;
+				file_size.push_back(ssize);
+			}
 
-		if (real_size != pot_size)
-		{
-			std::cout << "---------------------------------" << std::endl;
-			std::cout << this->command[1] << " is Broken!" << std::endl;
-			std::cout << "Real : " << real_size << std::endl;
-			std::cout << "pot : " << pot_size << std::endl;
-			std::cout << std::endl;
-			return false;
-		}
+			for (int i = 0; i < size; ++i)
+			{
+				uint ssize = file_size[i];
+				char *buf = new char[ssize];
+				in.read(reinterpret_cast<char *>(buf), ssize);
+				real_size += (uint)in.tellg() - real_size;
+			}
 
-		std::cout << "Un-Packageable File : " << this->command[1] << std::endl;
-		return true;
+			if (real_size != pot_size)
+			{
+				std::cout << "---------------------------------" << std::endl;
+				std::cout << this->command[x] << " is Broken!" << std::endl;
+				std::cout << "Real : " << real_size << std::endl;
+				std::cout << "pot : " << pot_size << std::endl;
+				std::cout << std::endl;
+				query_done = false;
+				break;
+			}
+
+			std::cout << "Un-Packageable File : " << this->command[x] << std::endl;
+		}
+		return query_done;
 	}
 };
 
