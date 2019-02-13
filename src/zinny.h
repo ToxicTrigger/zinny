@@ -135,7 +135,11 @@ class zinny
 		int version;
 		in.read(reinterpret_cast<char *>(&version), sizeof(int));
 		std::cout << "Version \t: " << version << std::endl;
-
+		if(!readable)
+		{
+			std::cout << "No more infomation \t: " << this->command[1] << std::endl;
+			return;
+		}
 		uint size;
 		in.read(reinterpret_cast<char *>(&size), sizeof(uint));
 		std::cout << "Files \t\t: " << size << std::endl;
